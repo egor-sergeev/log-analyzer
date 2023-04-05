@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Instant;
@@ -6,9 +7,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+@SuppressWarnings("ALL")
 public class LogFileGenerator {
 
-    private static final int NUM_USERS = 10000;
+    private static final int NUM_USERS = 500;
     private static final int NUM_LOGS_PER_USER = 98;
     private static final int OTHER_LOG_CHANCE = 4;
     private static final int MIN_INTERVAL_MS = 50;
@@ -28,6 +30,11 @@ public class LogFileGenerator {
     }
 
     private static void writeLogsToFile(List<LogEntry> logs, String fileName) throws IOException {
+        File f = new File(fileName);
+        if (!f.exists()) {
+            f.createNewFile();
+        }
+
         FileWriter writer = new FileWriter(fileName);
         for (LogEntry log : logs) {
             writer.write(getLogStr(log));
