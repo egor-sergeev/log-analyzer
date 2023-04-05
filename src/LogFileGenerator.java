@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class LogFileGenerator {
 
-    private static final int NUM_USERS = 500;
+    private static final int NUM_USERS = 10000;
     private static final int NUM_LOGS_PER_USER = 98;
     private static final int OTHER_LOG_CHANCE = 4;
     private static final int MIN_INTERVAL_MS = 50;
@@ -20,8 +20,27 @@ public class LogFileGenerator {
     private static final Random random = new Random();
 
     public static void main(String[] args) throws IOException {
-        List<LogEntry> logs = new ArrayList<>();
+        List<LogEntry> logs = generateLogs();
+        logs.sort(Comparator.comparing(LogEntry::getTime));
 
+        String fileName = "logs.txt";
+        writeLogsToFile(logs, fileName);
+    }
+
+    private static void writeLogsToFile(List<LogEntry> logs, String fileName) throws IOException {
+        FileWriter writer = new FileWriter(fileName);
+        for (LogEntry log : logs) {
+            writer.write(getLogStr(log));
+        }
+        writer.close();
+    }
+
+    private static String getLogStr(LogEntry log) {
+        return log.getUserId() + "|" + log.getTime().toString() + "|" + log.getSeverity() + "|" + log.getMessage() + "|" + log.getRequestId() + "\n";
+    }
+
+    private static List<LogEntry> generateLogs() {
+        List<LogEntry> logs = new ArrayList<>();
 
         for (int userId = 1; userId <= NUM_USERS; userId++) {
             for (int i = 1; i <= NUM_LOGS_PER_USER; i++) {
@@ -43,14 +62,7 @@ public class LogFileGenerator {
                 logs.add(new LogEntry(userId, requestId, requestProcessedTime, "INFO", "request_processed"));
             }
         }
-
-        logs.sort(Comparator.comparing(LogEntry::getTime));
-
-        FileWriter writer = new FileWriter("logs.txt");
-        for (LogEntry log : logs) {
-            writer.write(log.getUserId() + "|" + log.getTime().toString() + "|" + log.getSeverity() + "|" + log.getMessage() + "|" + log.getRequestId() + "\n");
-        }
-        writer.close();
+        return logs;
     }
 
 
